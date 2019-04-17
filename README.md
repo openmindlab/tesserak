@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="tesserak_small.png" alt="Tesserak">
+</p>
+
 # Tesserak
 
 Visual Studio Code plugin which copy a file to a specified output location related to the project
