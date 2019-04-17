@@ -19,7 +19,7 @@ Visual Studio Code plugin which copy a file to a specified output location relat
 
 Replace an exisiting file at the output location if it already exists. Default is true.
 ```json
-"tossfile.replaceIfExists": true
+"tesserak.replaceIfExists": true
 ```
 
 
