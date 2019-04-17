@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="tesserak_small.png" alt="Tesserak">
+    <img src="https://raw.githubusercontent.com/openmindlab/tesserak/master/tesserak_small.png" alt="Tesserak">
 </p>
 
 # Tesserak
