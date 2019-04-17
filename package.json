@@ -49,6 +49,7 @@
         "menus": {
             "explorer/context": [
                 {
+                    "when": "!explorerResourceIsFolder",
                     "command": "extension.tesserak",
                     "group": "5_cutcopypaste"
                 }
