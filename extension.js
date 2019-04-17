@@ -118,9 +118,15 @@ function activate(context) {
     let tf = new Tesserak();
     let tesserakFileCmd = vscode.commands.registerCommand('extension.tesserak', (file) => {
         const selectedFile = file.fsPath;
-        tf.settings = vscode.workspace.getConfiguration('tesserak');
-        tf.inputFile = selectedFile;
-        tf.file();
+        const configuration = vscode.workspace.getConfiguration('tesserak');
+        if(configuration.pathMapping.length){
+            tf.settings = configuration;
+            tf.inputFile = selectedFile;
+            tf.file();
+        }else{
+            vscode.window.showErrorMessage('Please configure Tesserak paths before');
+        }
+        
     });
     context.subscriptions.push(tf);
     context.subscriptions.push(tesserakFileCmd);
