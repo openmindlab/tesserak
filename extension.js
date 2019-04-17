@@ -9,7 +9,7 @@ class Tesserak {
         this.timer = null;
         this.workspacePath = '';
     }
-
+    
     set settings(settings) {
         this.pathMapping = settings.get('pathMapping', []);
         this.replaceIfExists = settings.get('replaceIfExists', true);
@@ -122,7 +122,6 @@ function activate(context) {
         tf.inputFile = selectedFile;
         tf.file();
     });
-
     context.subscriptions.push(tf);
     context.subscriptions.push(tesserakFileCmd);
 }
