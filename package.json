@@ -7,7 +7,7 @@
     "contributors": ["Remo Fiorentino <remojose29@gmail.com>", "Francesco Colonna <frappacchio@gmail.com>"],
     "license": "MIT",
     "homepage": "https://github.com/openmindlab/tesserak.git",
-    "icon": "tesserak_big.png",
+    "icon": "https://raw.githubusercontent.com/openmindlab/tesserak/master/tesserak_big.png",
     "repository": {
         "type": "git",
         "url": "https://github.com/openmindlab/tesserak.git"
