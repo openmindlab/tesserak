@@ -2,7 +2,7 @@
     "name": "tesserak",
     "displayName": "Tesserak",
     "description": "Copy a file to a specified output location related to the project",
-    "version": "1.1.2",
+    "version": "1.2.1",
     "publisher": "frappacchio",
     "contributors": [
         "Remo Fiorentino <remojose29@gmail.com>",
