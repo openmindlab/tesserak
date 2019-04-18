@@ -45,9 +45,10 @@ class Tesserak {
             this.pathMapping.forEach((pathMap)=>{
                 this.setOutputFile(pathMap);
                 if (this.outputFile) {
-                    if (this.isSkip(pathMap)) {
+                    if (this.shouldSkip()) {
                         //TODO: To analize if an error show message could be better for skipped files.
-                        this.setStatus("File already exist!");
+                        //TODO: be more verbose for reason to be skipped
+                        this.setStatus("File was  already exist!");
                     }else{
                         fse.mkdirp(path.dirname(this.outputFile)).then(() => {
                             fse.copy(this.inputFile, this.outputFile).then(() => {
@@ -60,13 +61,20 @@ class Tesserak {
         }
     }
 
-    isSkip(pathMap) {
-        let ret = false;
-        const replaceIfExists = this.getReplaceIfExists(pathMap.replaceIfExists);
-        if ((!replaceIfExists && fse.ensureFileSync(this.outputFile))) {
-            ret = true;
+    shouldSkip(){
+        if(this.isReplaceable()){
+            return false;
         }
-        return ret;
+        //TODO: to add more conditions
+        return true;
+    }
+
+
+    isReplaceable() {
+        if(this.replaceIfExists) return true;
+        
+        //TODO: it could be better to ask with vscode QuickPick<T> (https://code.visualstudio.com/api/references/vscode-api#QuickPick)
+        return fse.ensureFileSync(this.outputFile);
     }
 
 
