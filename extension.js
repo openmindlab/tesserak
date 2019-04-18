@@ -6,7 +6,6 @@ const fse = require('fs-extra');
 class Tesserak {
     constructor() {
         this.statusBar = null;
-        this.skipCount = 0;
         this.timer = null;
         this.workspacePath = '';
     }
@@ -43,19 +42,18 @@ class Tesserak {
 
     file() {
         if (this.inputFile) {
-            this.skipCount = 0;
             this.pathMapping.forEach((pathMap)=>{
                 this.setOutputFile(pathMap);
                 if (this.outputFile) {
                     if (this.isSkip(pathMap)) {
-                        this.skipCount++;
-                        return;
+                        //TODO: set skip message
+                    }else{
+                        fse.mkdirp(path.dirname(this.outputFile)).then(() => {
+                            fse.copy(this.inputFile, this.outputFile).then(() => {
+                                this.setStatus();
+                            });
+                        });        
                     }
-                    fse.mkdirp(path.dirname(this.outputFile)).then(() => {
-                        fse.copy(this.inputFile, this.outputFile).then(() => {
-                            this.setStatus();
-                        });
-                    });
                 }
             });
         }
