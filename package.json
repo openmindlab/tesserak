@@ -2,7 +2,7 @@
     "name": "tesserak",
     "displayName": "Tesserak",
     "description": "Copy a file to a specified output location related to the project",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "publisher": "frappacchio",
     "contributors": [
         "Remo Fiorentino <remojose29@gmail.com>",
@@ -10,7 +10,7 @@
     ],
     "license": "MIT",
     "homepage": "https://github.com/openmindlab/tesserak.git",
-    "icon": "tesserak_big.png",
+    "icon": "./resources/tesserak_big.png",
     "repository": {
         "type": "git",
         "url": "https://github.com/openmindlab/tesserak.git"
@@ -36,47 +36,41 @@
     ],
     "main": "./extension",
     "contributes": {
-        "commands": [
-            {
-                "command": "extension.tesserak",
-                "title": "Tesserak file",
-                "icon":{
-                    "light":"./resources/light-cube.svg",
-                    "dark":"./resources/dark-cube.svg"
-                }
+        "commands": [{
+            "command": "extension.tesserak",
+            "title": "Tesserak file",
+            "icon": {
+                "light": "./resources/light-cube.svg",
+                "dark": "./resources/dark-cube.svg"
             }
-        ],
+        }],
         "menus": {
-            "explorer/context": [
-                {
-                    "when": "!explorerResourceIsFolder",
-                    "command": "extension.tesserak",
-                    "group": "5_cutcopypaste"
-                }
-            ],
+            "explorer/context": [{
+                "when": "!explorerResourceIsFolder",
+                "command": "extension.tesserak",
+                "group": "5_cutcopypaste"
+            }],
             "editor/title": [{
                 "command": "extension.tesserak",
                 "group": "navigation"
             }]
         },
-        "configuration": [
-            {
-                "type": "object",
-                "title": "Tesserak Configuration",
-                "properties": {
-                    "tesserak.pathMapping": {
-                        "type": "array",
-                        "default": [],
-                        "description": "Array of path mapping objects. \"input\" is the input base absolute path. \"output\" is the output base absolute path."
-                    },
-                    "tesserak.replaceIfExists": {
-                        "type": "boolean",
-                        "default": true,
-                        "description": "Replace an exisiting file at the output location if it already exists."
-                    }
+        "configuration": [{
+            "type": "object",
+            "title": "Tesserak Configuration",
+            "properties": {
+                "tesserak.pathMapping": {
+                    "type": "array",
+                    "default": [],
+                    "description": "Array of path mapping objects. \"input\" is the input base absolute path. \"output\" is the output base absolute path."
+                },
+                "tesserak.replaceIfExists": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Replace an exisiting file at the output location if it already exists."
                 }
             }
-        ]
+        }]
     },
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",

@@ -9,7 +9,7 @@ class Tesserak {
         this.timer = null;
         this.workspacePath = '';
     }
-    
+
     set settings(settings) {
         this.pathMapping = settings.get('pathMapping', []);
         this.replaceIfExists = settings.get('replaceIfExists', true);
@@ -119,14 +119,14 @@ function activate(context) {
     let tesserakFileCmd = vscode.commands.registerCommand('extension.tesserak', (file) => {
         const selectedFile = file.fsPath;
         const configuration = vscode.workspace.getConfiguration('tesserak');
-        if(configuration.pathMapping.length){
+        if (configuration.pathMapping.length) {
             tf.settings = configuration;
             tf.inputFile = selectedFile;
             tf.file();
-        }else{
+        } else {
             vscode.window.showErrorMessage('Please configure Tesserak paths before');
         }
-        
+
     });
     context.subscriptions.push(tf);
     context.subscriptions.push(tesserakFileCmd);
