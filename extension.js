@@ -1,3 +1,4 @@
+// Libraries
 const vscode = require('vscode');
 const path = require('path');
 const fse = require('fs-extra');
@@ -117,16 +118,22 @@ class Tesserak {
 function activate(context) {
     let tf = new Tesserak();
     let tesserakFileCmd = vscode.commands.registerCommand('extension.tesserak', (file) => {
-        const selectedFile = file.fsPath;
-        const configuration = vscode.workspace.getConfiguration('tesserak');
-        if(configuration.pathMapping.length){
-            tf.settings = configuration;
-            tf.inputFile = selectedFile;
-            tf.file();
-        }else{
-            vscode.window.showErrorMessage('Please configure Tesserak paths before');
+        try {
+            const selectedFile = file.fsPath;
+            const configuration = vscode.workspace.getConfiguration('tesserak');
+            if(configuration.pathMapping.length){
+                tf.settings = configuration;
+                tf.inputFile = selectedFile;
+                tf.file();
+            }else{
+                vscode.window.showErrorMessage('Please configure Tesserak paths before');
+            }
         }
-        
+        catch(err) {
+            vscode.window.showErrorMessage('Unexpected error, check the terminal log (view -> ) for more information.', "Show log");
+            console.error("An unexpected error just happened, be patience and open an issue in the github page (https://github.com/openmindlab/tesserak) with the log message below.")
+            console.error(err);
+        }
     });
     context.subscriptions.push(tf);
     context.subscriptions.push(tesserakFileCmd);

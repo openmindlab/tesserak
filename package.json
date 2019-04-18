@@ -40,9 +40,9 @@
             {
                 "command": "extension.tesserak",
                 "title": "Tesserak file",
-                "icon":{
-                    "light":"./resources/light-cube.svg",
-                    "dark":"./resources/dark-cube.svg"
+                "icon": {
+                    "light": "./resources/light-cube.svg",
+                    "dark": "./resources/dark-cube.svg"
                 }
             }
         ],
@@ -54,10 +54,12 @@
                     "group": "5_cutcopypaste"
                 }
             ],
-            "editor/title": [{
-                "command": "extension.tesserak",
-                "group": "navigation"
-            }]
+            "editor/title": [
+                {
+                    "command": "extension.tesserak",
+                    "group": "navigation"
+                }
+            ]
         },
         "configuration": [
             {
