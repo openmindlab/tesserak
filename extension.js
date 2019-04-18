@@ -12,7 +12,7 @@ class Tesserak {
     
     set settings(settings) {
         this.pathMapping = settings.get('pathMapping', []);
-        this.replaceIfExists = settings.get('replaceIfExists', true);
+        this.replaceIfExists = settings.get('replaceIfExists', false);
     }
 
     set pathMapping(pathMapping) {
