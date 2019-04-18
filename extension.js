@@ -1,48 +1,57 @@
 const vscode = require('vscode');
 const path = require('path');
-const fse = require('fs-extra');
+const fs = require('fs-extra');
 
 class Tesserak {
-    constructor() {
-        this.statusBar = null;
-        this.skipCount = 0;
-        this.timer = null;
-        this.workspacePath = '';
+    constructor(){
+        const settings = vscode.workspace.getConfiguration('tesserak');
+        console.log(settings.has('pathMapping'));
+        if(!settings.has('pathMapping') || typeof settings.get('pathMapping')[0].input === 'undefined' || typeof settings.get('pathMapping')[0].output === 'undefined'){
+            this.displayConfigurationMessage();
+            this.hasConfig = false;
+        }else{
+            this.inputPath = settings.get('pathMapping')[0].input;
+            this.outpuPath = settings.get('pathMapping')[0].output;
+            this.hasConfig = true;
+        }
+        this.replaceIfExists = (!settings.length || typeof settings.replaceIfExists === 'undefined') ? true : settings.replaceIfExists;
     }
-
-    set settings(settings) {
+    displayConfigurationMessage(){
+        vscode.window.showErrorMessage('Please configure Tesserak paths before');
+    }
+    /* set settings(settings) {
         this.pathMapping = settings.get('pathMapping', []);
         this.replaceIfExists = settings.get('replaceIfExists', true);
     }
 
     set pathMapping(pathMapping) {
-        this._pathMapping = Array.isArray(pathMapping) ? pathMapping : [];
+        this.pathMapping = Array.isArray(pathMapping) ? pathMapping : [];
     }
 
     get pathMapping() {
-        return this._pathMapping;
+        return this.pathMapping;
     }
 
     set replaceIfExists(replaceIfExists) {
-        this._replaceIfExists = replaceIfExists === false ? false : true;
+        this.replaceIfExists = replaceIfExists === false ? false : true;
     }
 
     get replaceIfExists() {
-        return this._replaceIfExists;
-    }
+        return this.replaceIfExists;
+    } */
 
 
-    set inputFile(inputFile) {
-        this._inputFile = inputFile && path.isAbsolute(inputFile) ? inputFile : null;
+    /* set inputFiles(inputFiles) {
+        this.inputFiles = inputFiles && path.isAbsolute(inputFiles) ? inputFiles : [];
     }
 
-    get inputFile() {
-        return this._inputFile;
-    }
+    get inputFiles() {
+        return this.inputFiles || [];
+    } */
 
     file() {
-        if (this.inputFile) {
-            this.skipCount = 0;
+        if (this.inputFiles.length) {
+            /* this.skipCount = 0;
             for (let i = 0; i < this.pathMapping.length; i++) {
                 const pathMap = this.pathMapping[i];
                 this.setOutputFile(pathMap);
@@ -51,34 +60,34 @@ class Tesserak {
                         this.skipCount++;
                         continue;
                     }
-                    fse.mkdirp(path.dirname(this.outputFile)).then(() => {
-                        fse.copy(this.inputFile, this.outputFile).then(() => {
+                    fs.mkdirp(path.dirname(this.outputFile)).then(() => {
+                        fs.copy(this.inputFiles, this.outputFile).then(() => {
                             this.setStatus();
                         });
                     });
                 }
-            }
+            } */
         }
     }
 
-    isSkip(pathMap) {
+    /* isSkip() {
         let ret = false;
-        const replaceIfExists = this.getReplaceIfExists(pathMap.replaceIfExists);
-        if ((!replaceIfExists && fse.ensureFileSync(this.outputFile))) {
+        if ((!this.replaceIfExists && fs.ensureFileSync(this.outputFile))) {
             ret = true;
         }
         return ret;
+        return (!this.replaceIfExists && fs.ensureFileSync(this.outputFile));
     }
 
     getReplaceIfExists(replaceIfExists) {
         return replaceIfExists === false || replaceIfExists === true ? replaceIfExists : this.replaceIfExists;
-    }
+    } */
 
     setOutputFile(pathMapping) {
         this.outputFile = null;
         if (pathMapping.input && pathMapping.output) {
-            const relativeFile = vscode.workspace.asRelativePath(this.inputFile, false);
-            this.workspacePath = this.inputFile.replace(relativeFile, '');
+            const relativeFile = vscode.workspace.asRelativePath(this.inputFiles, false);
+            this.workspacePath = this.inputFiles.replace(relativeFile, '');
             if (relativeFile.startsWith(pathMapping.input)) {
                 this.outputFile = `${this.workspacePath}${pathMapping.output}${relativeFile.replace(pathMapping.input, '')}`;
             }
@@ -114,22 +123,42 @@ class Tesserak {
     }
 }
 
-function activate(context) {
-    let tf = new Tesserak();
-    let tesserakFileCmd = vscode.commands.registerCommand('extension.tesserak', (file) => {
-        const selectedFile = file.fsPath;
+function activate() {
+    const tesserak = new Tesserak();
+    vscode.commands.registerCommand('extension.tesserakThis', (file, files) => {
+        if (tesserak.hasConfig) {
+            tesserak.inputFiles = files;
+            tesserak.file();
+        } else {
+            tesserak.displayConfigurationMessage();
+        }
+
+    });
+    /* let tf = new Tesserak();
+    vscode.commands.registerCommand('extension.tesserak', (file) => {
         const configuration = vscode.workspace.getConfiguration('tesserak');
         if (configuration.pathMapping.length) {
             tf.settings = configuration;
-            tf.inputFile = selectedFile;
+            tf.inputFiles = file;
             tf.file();
         } else {
             vscode.window.showErrorMessage('Please configure Tesserak paths before');
         }
 
     });
-    context.subscriptions.push(tf);
-    context.subscriptions.push(tesserakFileCmd);
+    vscode.commands.registerCommand('extension.tesserakThis', (file, files) => {
+        const configuration = vscode.workspace.getConfiguration('tesserak');
+        if (configuration.pathMapping.length) {
+            tf.settings = configuration;
+            tf.inputFiles = files;
+            tf.file();
+        } else {
+            vscode.window.showErrorMessage('Please configure Tesserak paths before');
+        }
+
+    }); */
+    /* context.subscriptions.push(tf);
+    context.subscriptions.push(tesserakFileCmd); */
 }
 exports.activate = activate;
 

@@ -32,22 +32,27 @@
         "file copy"
     ],
     "activationEvents": [
-        "onCommand:extension.tesserak"
+        "onCommand:extension.tesserak",
+        "onCommand:extension.tesserakThis"
     ],
     "main": "./extension",
     "contributes": {
         "commands": [{
             "command": "extension.tesserak",
-            "title": "Tesserak file",
+            "title": "Tesserak opened file",
             "icon": {
                 "light": "./resources/light-cube.svg",
                 "dark": "./resources/dark-cube.svg"
             }
+        },
+        {
+            "command": "extension.tesserakThis",
+            "title": "Tesserak this!"
         }],
         "menus": {
             "explorer/context": [{
                 "when": "!explorerResourceIsFolder",
-                "command": "extension.tesserak",
+                "command": "extension.tesserakThis",
                 "group": "5_cutcopypaste"
             }],
             "editor/title": [{
