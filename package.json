@@ -10,7 +10,7 @@
     ],
     "license": "MIT",
     "homepage": "https://github.com/openmindlab/tesserak.git",
-    "icon": "./resources/tesserak_big.png",
+    "icon": "resources/tesserak_big.png",
     "repository": {
         "type": "git",
         "url": "https://github.com/openmindlab/tesserak.git"
