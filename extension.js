@@ -46,11 +46,12 @@ class Tesserak {
                 this.setOutputFile(pathMap);
                 if (this.outputFile) {
                     if (this.isSkip(pathMap)) {
-                        //TODO: set skip message
+                        //TODO: To analize if an error show message could be better for skipped files.
+                        this.setStatus("File already exist!");
                     }else{
                         fse.mkdirp(path.dirname(this.outputFile)).then(() => {
                             fse.copy(this.inputFile, this.outputFile).then(() => {
-                                this.setStatus();
+                                this.setStatus("Copied file to output location");
                             });
                         });        
                     }
@@ -68,6 +69,7 @@ class Tesserak {
         return ret;
     }
 
+
     getReplaceIfExists(replaceIfExists) {
         return replaceIfExists === false || replaceIfExists === true ? replaceIfExists : this.replaceIfExists;
     }
@@ -83,16 +85,15 @@ class Tesserak {
         }
     }
 
-    setStatus() {
-        const baseText = "Copied file to output location";
+    setStatus(statusMessage) {
         this.statusBar = vscode.window.createStatusBarItem(1);
-        this.statusBar.text = baseText;
+        this.statusBar.text = statusMessage;
         this.statusBar.show();
         this.timer = setTimeout(() => {
             this.statusBar.hide();
             this.statusBar = null;
         }, 3000);
-        vscode.window.showInformationMessage(baseText, 'open file').then(() => {
+        vscode.window.showInformationMessage(statusMessage, 'open file').then(() => {
             vscode.workspace.openTextDocument(this.outputFile).then((doc) => {
                 vscode.window.showTextDocument(doc);
             });
@@ -128,7 +129,7 @@ function activate(context) {
         }
         catch(err) {
             vscode.window.showErrorMessage('Unexpected error, check the terminal log (view -> ) for more information.', "Show log");
-            console.error("An unexpected error just happened, be patience and open an issue in the github page (https://github.com/openmindlab/tesserak) with the log message below.")
+            console.error("An unexpected error just happened, be patience and open an issue in the github page (https://github.com/openmindlab/tesserak) with the log message below.");
             console.error(err);
         }
     });
