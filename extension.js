@@ -31,7 +31,6 @@ class Tesserak {
         return this._replaceIfExists;
     }
 
-
     set inputFile(inputFile) {
         this._inputFile = inputFile && path.isAbsolute(inputFile) ? inputFile : null;
     }
@@ -47,7 +46,7 @@ class Tesserak {
                 if (this.outputFile) {
                     if (this.shouldSkip()) {
                         //TODO: To analize if an error show message could be better for skipped files.
-                        //TODO: be more verbose for reason to be skipped
+                        //TODO: be more verbose for the reason to be skipped
                         this.setStatus("File was  already exist!");
                     }else{
                         fse.mkdirp(path.dirname(this.outputFile)).then(() => {
@@ -75,11 +74,6 @@ class Tesserak {
         
         //TODO: it could be better to ask with vscode QuickPick<T> (https://code.visualstudio.com/api/references/vscode-api#QuickPick)
         return fse.ensureFileSync(this.outputFile);
-    }
-
-
-    getReplaceIfExists(replaceIfExists) {
-        return replaceIfExists === false || replaceIfExists === true ? replaceIfExists : this.replaceIfExists;
     }
 
     setOutputFile(pathMapping) {
@@ -126,6 +120,7 @@ function activate(context) {
     let tesserakFileCmd = vscode.commands.registerCommand('extension.tesserak', (file) => {
         try {
             const selectedFile = file.fsPath;
+            //FIXME: there is a weird behavior replaceIfExists is setted as true when missing. To test.
             const configuration = vscode.workspace.getConfiguration('tesserak');
             if(configuration.pathMapping.length){
                 tf.settings = configuration;
