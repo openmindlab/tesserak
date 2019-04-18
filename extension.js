@@ -44,13 +44,12 @@ class Tesserak {
     file() {
         if (this.inputFile) {
             this.skipCount = 0;
-            for (let i = 0; i < this.pathMapping.length; i++) {
-                const pathMap = this.pathMapping[i];
+            this.pathMapping.forEach((pathMap)=>{
                 this.setOutputFile(pathMap);
                 if (this.outputFile) {
                     if (this.isSkip(pathMap)) {
                         this.skipCount++;
-                        continue;
+                        return;
                     }
                     fse.mkdirp(path.dirname(this.outputFile)).then(() => {
                         fse.copy(this.inputFile, this.outputFile).then(() => {
@@ -58,7 +57,7 @@ class Tesserak {
                         });
                     });
                 }
-            }
+            });
         }
     }
 
