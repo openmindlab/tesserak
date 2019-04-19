@@ -120,7 +120,6 @@ function activate(context) {
     let tesserakFileCmd = vscode.commands.registerCommand('extension.tesserak', (file) => {
         try {
             const selectedFile = file.fsPath;
-            //FIXME: there is a weird behavior replaceIfExists is setted as true when missing. To test.
             const configuration = vscode.workspace.getConfiguration('tesserak');
             if(configuration.pathMapping.length){
                 tf.settings = configuration;

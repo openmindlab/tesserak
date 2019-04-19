@@ -73,7 +73,7 @@
                     },
                     "tesserak.replaceIfExists": {
                         "type": "boolean",
-                        "default": true,
+                        "default": false,
                         "description": "Replace an exisiting file at the output location if it already exists."
                     }
                 }
