@@ -51,7 +51,6 @@
         }],
         "menus": {
             "explorer/context": [{
-                "when": "!explorerResourceIsFolder",
                 "command": "extension.tesserakThis",
                 "group": "5_cutcopypaste"
             }],
