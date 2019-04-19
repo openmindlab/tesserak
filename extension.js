@@ -95,7 +95,8 @@ function activate() {
     const tesserak = new Tesserak();
     vscode.commands.registerCommand('extension.tesserakThis', (file, files) => {
         if (tesserak.hasConfig) {
-            tesserak.inputFiles = files;
+            const fileList = files.length?files:[file];
+            tesserak.inputFiles = fileList;
             tesserak.file();
         } else {
             tesserak.showErrorMessage();
