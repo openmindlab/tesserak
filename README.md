@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://raw.githubusercontent.com/openmindlab/tesserak/master/tesserak_small.png" alt="Tesserak">
+    <img src="https://raw.githubusercontent.com/openmindlab/tesserak/master/resources/tesserak_small.png" alt="Tesserak">
 </p>
 
 # Tesserak
@@ -25,5 +25,9 @@ Replace an exisiting file at the output location if it already exists. Default i
 
 ## Example Scenarios
 
-Right click on file within the explorer view and select ***Tesserak file*** context menu voice.
-It will create a copy of given file to output destination mantaining the folder structure 
+Right click on file(s) or folder(s) within the explorer view and select ***Tesserak this!*** context menu voice.
+It will create a copy of given file(s) or folder(s) to output destination mantaining the folder structure.
+
+### Notes ###
+
+We suggest to create a Workspace Settings file in order to use relative paths.

@@ -1,144 +1,111 @@
 // Libraries
 const vscode = require('vscode');
 const path = require('path');
-const fse = require('fs-extra');
-
+const fs = require('fs-extra');
+const ERRORS = {
+    misconfiguration: 'Please configure Tesserak paths before',
+    unreplaceable: 'A file in the same position already exists.\nYour settings avoid to override it'
+};
+const MESSAGES = {
+    successCopyed: 'Copied file to output location',
+    successCopyedFolder: 'Copied folder and content to output location'
+};
 class Tesserak {
     constructor() {
-        this.statusBar = null;
-        this.timer = null;
-        this.workspacePath = '';
+        const settings = vscode.workspace.getConfiguration('tesserak');
+        if (!settings.has('pathMapping') || typeof settings.get('pathMapping')[0].input === 'undefined' || typeof settings.get('pathMapping')[0].output === 'undefined') {
+            this.showErrorMessage('misconfiguration');
+            this.hasConfig = false;
+        } else {
+            this.inputPath = settings.get('pathMapping')[0].input;
+            this.outpuPath = settings.get('pathMapping')[0].output;
+            this.hasConfig = true;
+        }
+        this.replaceIfExists = (!settings.has('replaceIfExists') || typeof settings.replaceIfExists !== 'boolean') ? true : settings.get('replaceIfExists');
     }
-    
-    set settings(settings) {
-        this.pathMapping = settings.get('pathMapping', []);
-        this.replaceIfExists = settings.get('replaceIfExists', false);
+    showErrorMessage(error) {
+        vscode.window.showErrorMessage(ERRORS[error]);
     }
-
-    set pathMapping(pathMapping) {
-        this._pathMapping = Array.isArray(pathMapping) ? pathMapping : [];
+    showMessage(message) {
+        vscode.window.showInformationMessage(MESSAGES[message]);
     }
-
-    get pathMapping() {
-        return this._pathMapping;
-    }
-
-    set replaceIfExists(replaceIfExists) {
-        this._replaceIfExists = replaceIfExists === false ? false : true;
-    }
-
-    get replaceIfExists() {
-        return this._replaceIfExists;
-    }
-
-    set inputFile(inputFile) {
-        this._inputFile = inputFile && path.isAbsolute(inputFile) ? inputFile : null;
-    }
-
-    get inputFile() {
-        return this._inputFile;
-    }
-
-    file() {
-        if (this.inputFile) {
-            this.pathMapping.forEach((pathMap)=>{
-                this.setOutputFile(pathMap);
-                if (this.outputFile) {
-                    if (this.shouldSkip()) {
-                        //TODO: To analize if an error show message could be better for skipped files.
-                        //TODO: be more verbose for the reason to be skipped
-                        this.setStatus("File was  already exist!");
-                    }else{
-                        fse.mkdirp(path.dirname(this.outputFile)).then(() => {
-                            fse.copy(this.inputFile, this.outputFile).then(() => {
-                                this.setStatus("Copied file to output location");
-                            });
-                        });        
-                    }
-                }
+    showMessageAndOpenFile(message, file) {
+        vscode.window.showInformationMessage(MESSAGES[message], 'open file').then(() => {
+            vscode.workspace.openTextDocument(file).then((doc) => {
+                vscode.window.showTextDocument(doc);
             });
-        }
+        });
     }
-
-    shouldSkip(){
-        if(this.isReplaceable()){
-            return false;
-        }
-        //TODO: to add more conditions
-        return true;
-    }
-
-
-    isReplaceable() {
-        if(this.replaceIfExists) return true;
-        
-        //TODO: it could be better to ask with vscode QuickPick<T> (https://code.visualstudio.com/api/references/vscode-api#QuickPick)
-        return fse.ensureFileSync(this.outputFile);
-    }
-
-    setOutputFile(pathMapping) {
-        this.outputFile = null;
-        if (pathMapping.input && pathMapping.output) {
-            const relativeFile = vscode.workspace.asRelativePath(this.inputFile, false);
-            this.workspacePath = this.inputFile.replace(relativeFile, '');
-            if (relativeFile.startsWith(pathMapping.input)) {
-                this.outputFile = `${this.workspacePath}${pathMapping.output}${relativeFile.replace(pathMapping.input, '')}`;
-            }
-        }
-    }
-
-    setStatus(statusMessage) {
+    displayStatusBarMessage(message) {
         this.statusBar = vscode.window.createStatusBarItem(1);
-        this.statusBar.text = statusMessage;
+        this.statusBar.text = MESSAGES[message];
         this.statusBar.show();
         this.timer = setTimeout(() => {
             this.statusBar.hide();
             this.statusBar = null;
         }, 3000);
-        vscode.window.showInformationMessage(statusMessage, 'open file').then(() => {
-            vscode.workspace.openTextDocument(this.outputFile).then((doc) => {
-                vscode.window.showTextDocument(doc);
-            });
-        });
     }
 
-    clearStatus() {
-        clearTimeout(this.timer);
+    file() {
+        if (this.inputFiles.length) {
+            this.inputFiles.forEach(file => {
+                const outputFile = this.getOutputFile(file.fsPath);
+                if (!this.skipFile(outputFile) && outputFile !== '') {
+                    fs.mkdirp(path.dirname(outputFile)).then(() => {
+                        fs.copy(file.fsPath, outputFile).then(() => {
+                            this.displayStatusBarMessage('successCopyed');
+                            if (!!path.extname(file.fsPath)) {
+                                this.showMessageAndOpenFile('successCopyed', outputFile);
+                            } else {
+                                this.showMessage('successCopyedFolder');
+                            }
+
+                        });
+                    });
+                } else {
+                    this.showErrorMessage('unreplaceable');
+                }
+            });
+        }
+    }
+    skipFile(file) {
+        return this.replaceIfExists === false && fs.pathExistsSync(file);
+    }
+
+    getOutputFile(file) {
+        const relativeFile = vscode.workspace.asRelativePath(file, false);
+        this.workspacePath = file.replace(relativeFile, '');
+        if (relativeFile.startsWith(this.inputPath)) {
+            return `${this.workspacePath}${this.outpuPath}${relativeFile.replace(this.inputPath, '')}`;
+        } else {
+            return '';
+        }
     }
 
     dispose() {
-        this.clearStatus();
+        clearTimeout(this.timer);
         this.timer = null;
         this.statusBar.dispose();
         this.statusBar = null;
         this._pathMapping = null;
     }
+
 }
 
-function activate(context) {
-    let tf = new Tesserak();
-    let tesserakFileCmd = vscode.commands.registerCommand('extension.tesserak', (file) => {
-        try {
-            const selectedFile = file.fsPath;
-            const configuration = vscode.workspace.getConfiguration('tesserak');
-            if(configuration.pathMapping.length){
-                tf.settings = configuration;
-                tf.inputFile = selectedFile;
-                tf.file();
-            }else{
-                vscode.window.showErrorMessage('Please configure Tesserak paths before');
-            }
+function activate() {
+    const tesserak = new Tesserak();
+    vscode.commands.registerCommand('extension.tesserakThis', (file, files) => {
+        if (tesserak.hasConfig) {
+            const fileList = files.length ? files : [file];
+            tesserak.inputFiles = fileList;
+            tesserak.file();
+        } else {
+            tesserak.showErrorMessage();
         }
-        catch(err) {
-            vscode.window.showErrorMessage('Unexpected error, check the terminal log (view -> ) for more information.', "Show log");
-            console.error("An unexpected error just happened, be patience and open an issue in the github page (https://github.com/openmindlab/tesserak) with the log message below.");
-            console.error(err);
-        }
+
     });
-    context.subscriptions.push(tf);
-    context.subscriptions.push(tesserakFileCmd);
 }
 exports.activate = activate;
 
-function deactivate() {}
+function deactivate() { }
 exports.deactivate = deactivate;
