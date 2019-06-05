@@ -17,8 +17,9 @@ class Tesserak {
             this.showErrorMessage('misconfiguration');
             this.hasConfig = false;
         } else {
-            this.inputPath = settings.get('pathMapping')[0].input;
-            this.outpuPath = settings.get('pathMapping')[0].output;
+            this.paths = settings.get('pathMapping');
+            // this.inputPath = settings.get('pathMapping')[0].input;
+            // this.outpuPath = settings.get('pathMapping')[0].output;
             this.hasConfig = true;
         }
         this.replaceIfExists = (!settings.has('replaceIfExists') || typeof settings.replaceIfExists !== 'boolean') ? true : settings.get('replaceIfExists');
@@ -75,11 +76,8 @@ class Tesserak {
     getOutputFile(file) {
         const relativeFile = vscode.workspace.asRelativePath(file, false);
         this.workspacePath = file.replace(relativeFile, '');
-        if (relativeFile.startsWith(this.inputPath)) {
-            return `${this.workspacePath}${this.outpuPath}${relativeFile.replace(this.inputPath, '')}`;
-        } else {
-            return '';
-        }
+        let pathToMap = this.paths.filter(path => relativeFile.startsWith(path.input))[0];
+        return (pathToMap !== undefined && typeof pathToMap === 'object') ? `${this.workspacePath}${pathToMap.output}${relativeFile.replace(pathToMap.input, '')}` : '';
     }
 
     dispose() {
